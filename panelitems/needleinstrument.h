@@ -74,7 +74,7 @@ protected:
     float _thickBars, _thinBars;
     float _numbers;
     float _numberScale;
-    float _value, _zeroangle, _maxAngle, _zeroValue, _maxValue;
+    float _value, _zeroAngle, _maxAngle, _zeroValue, _maxValue;
     QString _label;
     QList<Arc*> _arcs;
     Needle *needle;

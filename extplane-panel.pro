@@ -131,7 +131,8 @@ SOURCES += \
     panelitems/dial.cpp \
     dialogs/bindingcurvedialog.cpp \
     util/interpolation.cpp \
-    hardware/nulloutputdevice.cpp
+    hardware/nulloutputdevice.cpp \
+    panelitems/genericgauge.cpp
 
 HEADERS += \
     $$EXTPLANE_CLIENT_PATH/extplaneconnection.h \
@@ -196,7 +197,8 @@ HEADERS += \
     panelitems/dial.h \
     dialogs/bindingcurvedialog.h \
     util/interpolation.h \
-    hardware/nulloutputdevice.h
+    hardware/nulloutputdevice.h \
+    panelitems/genericgauge.h
 
 FORMS += dialogs/settingsdialog.ui \
     dialogs/edititemdialog.ui \

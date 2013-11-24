@@ -51,7 +51,7 @@ void Arc::setColor(QString colorString){
 
 NeedleInstrument::NeedleInstrument(ExtPlanePanel *panel) :
     PanelItem(panel, PanelItemTypeGauge, PanelItemShapeCircular) {
-    _value = _zeroangle = 0;
+    _value = _zeroAngle = 0;
     _zeroValue = 0;
     _maxValue = 1;
     _maxAngle = 360;
@@ -100,7 +100,7 @@ void NeedleInstrument::setLabel(QString text) {
 
 void NeedleInstrument::setScale(float zeroAngle, float zeroValue, float maxAngle, float maxValue) {
     Q_ASSERT(maxAngle != 0);
-    _zeroangle = zeroAngle;
+    _zeroAngle = zeroAngle;
     _zeroValue = zeroValue;
     _maxAngle = maxAngle;
     _maxValue = maxValue;
@@ -196,7 +196,7 @@ void NeedleInstrument::setBars(float thick, float thin) {
 }
 
 float NeedleInstrument::value2Angle(float value) {
-    return _zeroangle +  ((value - _zeroValue) / (_maxValue - _zeroValue)) * (_maxAngle - _zeroangle);
+    return _zeroAngle +  ((value - _zeroValue) / (_maxValue - _zeroValue)) * (_maxAngle - _zeroAngle);
 }
 
 int NeedleInstrument::numberOfArcs(void) {
