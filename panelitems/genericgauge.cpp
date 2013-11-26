@@ -6,20 +6,17 @@
 #include "../valueinterpolator.h"
 #include "../needles/gabalancedneedle.h"
 
+//debug
+#include "../util/console.h"
+
 REGISTER_WITH_PANEL_ITEM_FACTORY( GenericGauge, "indicator/generic/round" );
 
 GenericGauge::GenericGauge( ExtPlanePanel *panel, ExtPlaneConnection *conn ) : NeedleInstrument( panel ),
     _client( this, typeName(), conn ), interpolator( 0, 3 ) {
     conn->registerClient( &_client );
-    setDataRefName( "sim/cockpit2/engine/actuators/throttle_ratio" );
-    // I'm copypastaing hopefully here but with no real understanding of what's going on. - JSD
-//    connect( &_client, SIGNAL( refChanged( QString, double ) ),
-//             this, SLOT( valueChanged( QString, double ) ) );
-//    connect( &_client, SIGNAL( refChanged( QString, QString ) ),
-//             this, SLOT( valueChanged( QString, QString ) ) );
-//    connect( &_client, SIGNAL( refChanged( QString, QStringList ) ),
-//             this, SLOT( valueChanged( QString, QStringList ) ) );
+    setDataRefName( "sim/cockpit/radios/transponder_brightness" );
 
+    /// interpolate for non-array numeric return datarefs
     connect( &_client, SIGNAL( refChanged( QString, double ) ),
              &interpolator, SLOT( valueChanged( QString, double ) ) );
     connect( &interpolator, SIGNAL( interpolatedValueChanged( QString, double ) ),
@@ -32,17 +29,6 @@ GenericGauge::GenericGauge( ExtPlanePanel *panel, ExtPlaneConnection *conn ) : N
     connect( &_client, SIGNAL( refChanged( QString, QStringList ) ),
              this, SLOT( valueChanged( QString, QStringList ) ) );
 
-// following code doesn't work.
-//    connect( &_client, SIGNAL( refChanged( QString, QString ) ),
-//             &interpolator, SLOT( valueChanged( QString, QString ) ) );
-//    connect( &interpolator, SIGNAL( interpolatedValueChanged( QString, QString ) ),
-//             this, SLOT( valueChanged( QString, QString ) ) );
-
-//    connect( &_client, SIGNAL( refChanged( QString, QStringList ) ),
-//             &interpolator, SLOT( valueChanged( QString, QStringList ) ) );
-//    connect( &interpolator, SIGNAL( interpolatedValueChanged( QString, QStringList ) ),
-//             this, SLOT( valueChanged( QString, QStringList ) ) );
-
     setDataRefIndex( 0 );
     _label = "New Gauge";
     setBars( 1, 0.5 );
@@ -53,6 +39,7 @@ GenericGauge::GenericGauge( ExtPlanePanel *panel, ExtPlaneConnection *conn ) : N
     _maxValue = 1.0f;
 
     setNeedle( new GABalancedNeedle( this ) );
+
 }
 
 void GenericGauge::valueChanged( QString name , double val ) {
@@ -95,10 +82,13 @@ void GenericGauge::storeSettings( QSettings &settings ) {
 }
 
 void GenericGauge::loadSettings( QSettings &settings ) {
+
+    //debug
+    //INFO << "New GenericGauge " << this;
+
     PanelItem::loadSettings( settings );
 
-    //setDataRefName( settings.value( "datarefname","sim/cockpit/radios/transponder_brightness" ).toString() );
-    setDataRefName( settings.value( "datarefname", "sim/cockpit2/engine/actuators/throttle_ratio" ).toString() );
+    setDataRefName( settings.value( "datarefname","sim/cockpit/radios/transponder_brightness" ).toString() );
     setDataRefIndex( settings.value( "datarefindex", 0 ).toUInt( ) );
     setLabel( settings.value( "label", "").toString() );
 
@@ -109,8 +99,12 @@ void GenericGauge::loadSettings( QSettings &settings ) {
 
     setThickBar( settings.value( "thickBars", ( _maxValue-_zeroValue )/4.0f ).toDouble() );
     setThinBar( settings.value( "thinBars", ( _maxValue-_zeroValue )/16.0f ).toDouble() );
-    setNumbers( settings.value( "numbersInterval", _thickBars ).toDouble() );
+    setNumbers( settings.value( "numberInterval", _thickBars ).toDouble() );
     setNumberScale( settings.value( "numberScale", 1 ).toDouble() );
+
+    //debug
+    //INFO << "Dataref: " << _currentName << "[" << _index << "]";
+
 }
 
 void GenericGauge::setDataRefName( QString name ) {
