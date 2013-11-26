@@ -32,11 +32,11 @@ private:
     ExtPlaneClient _client;
     int _buttonId;
     QString _label;
-    QString _refname;
+    QString _refName;
     uint _refIndex;
     bool _value;
     ClientDataRef* _ref;
-    int switchWidth;
+    int _switchWidth;
 };
 
 #endif // SWITCH_H
