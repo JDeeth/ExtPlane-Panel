@@ -14,10 +14,20 @@ Switch::Switch(ExtPlanePanel *panel, ExtPlaneConnection *conn) :
         PanelItem(panel, PanelItemTypeSwitch, PanelItemShapeRectangular),
         _client(this, typeName(), conn) {
     conn->registerClient(&_client);
-    connect(&_client, SIGNAL(refChanged(QString,double)), this, SLOT(valueChanged(QString,double)));
+
+    connect( &_client, SIGNAL( refChanged( QString,double ) ),
+             this, SLOT( valueChanged( QString,double ) ) );
+
+    connect( &_client, SIGNAL( refChanged( QString, QString ) ),
+             this, SLOT( valueChanged( QString, QString ) ) );
+
+    connect( &_client, SIGNAL( refChanged( QString, QStringList ) ),
+             this, SLOT( valueChanged( QString, QStringList ) ) );
+
     _value = false;
     _label = "Switch";
     _ref = 0;
+    _refIndex = 0;
     setSize(100,30);
 }
 
@@ -77,6 +87,8 @@ void Switch::createSettings(QGridLayout *layout) {
     QLineEdit *refEdit = new QLineEdit(_refname, layout->parentWidget());
     connect(refEdit, SIGNAL(textChanged(QString)), this, SLOT(setRef(QString)));
     layout->addWidget(refEdit);
+
+    createNumberInputSetting( layout, "DataRef Index", _refIndex, SLOT( setRefIndex( float ) ) );
 }
 
 void Switch::applySettings() {
@@ -85,7 +97,7 @@ void Switch::applySettings() {
         _ref = 0;
     }
     if(!_refname.isEmpty())
-        _ref = _client.subscribeDataRef(_refname, 0);
+        _ref = _client.subscribeDataRef(_refname, _refIndex);
 }
 
 void Switch::setLabel(QString txt) {
@@ -102,6 +114,11 @@ void Switch::setRef(QString txt) {
     update();
 }
 
+void Switch::setRefIndex( float index ) {
+    _refIndex = (uint)index;
+    setRef( _refname );
+}
+
 void Switch::mousePressEvent ( QGraphicsSceneMouseEvent * event ) {
     if(isEditMode()) {
         PanelItem::mousePressEvent(event);
@@ -113,13 +130,35 @@ void Switch::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
         PanelItem::mouseReleaseEvent(event);
     } else if(event->pos().x() < switchWidth) {
         _value = !_value;
-        if(_ref) _ref->setValue(_value ? 1 : 0);
+        if(_ref) _ref->setValue(_value ? 1 : 0, _refIndex);
         update();
     }
 }
 
-void Switch::valueChanged(QString ref, double newValue) {
+void Switch::valueChanged( QString ref, double newValue) {
     DEBUG << ref << newValue;
     Q_ASSERT(ref==_refname);
     _value = newValue != 0;
+
+    INFO << "d newValue " << newValue << " gives " << _value;
+
+    update();
+}
+
+void Switch::valueChanged( QString ref , QString newValue ) {
+    valueChanged( ref, newValue.toDouble() );
+
+    INFO << "QS newValue " << newValue << " gives " << _value;
+}
+
+void Switch::valueChanged( QString ref, QStringList newValues) {
+    uint i = _refIndex;
+    if( i >= newValues.size() ) {
+        i = newValues.size() - 1;
+    }
+    _value = newValues.at( i ).toInt() != 0;
+
+    INFO << "QSList newValues " << newValues.at( i ) << " gives " << _value;
+
+    update();
 }

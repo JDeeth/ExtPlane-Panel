@@ -19,14 +19,21 @@ protected:
 signals:
 
 public slots:
-    void setLabel(QString txt);
-    void setRef(QString ref);
+    void setLabel( QString txt );
+    void setRef( QString ref );
+    void setRefIndex( float index ); //needs to be float else ERRORS
+    void valueChanged( QString ref, double newValue);
+    void valueChanged( QString name, QString val);
+    void valueChanged( QString name, QStringList values);
+
 private slots:
-    void valueChanged(QString ref, double newValue);
+
 private:
     ExtPlaneClient _client;
     int _buttonId;
-    QString _label, _refname;
+    QString _label;
+    QString _refname;
+    uint _refIndex;
     bool _value;
     ClientDataRef* _ref;
     int switchWidth;
